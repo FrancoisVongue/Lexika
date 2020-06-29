@@ -4,18 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --build",
+    "execute": "node ./dist",
+    "start": "cross-env NODE_ENV=development nodemon",
+    "start:prod": "cross-env NODE_ENV=production nodemon"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "config": "^3.3.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.20",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
+    "@types/mongoose": "^5.7.28",
     "@types/node": "^14.0.14",
+    "concurrently": "^5.2.0",
+    "cross-env": "^7.0.2",
     "nodemon": "^2.0.4",
+    "rimraf": "^3.0.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   }
