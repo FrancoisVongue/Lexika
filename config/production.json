@@ -1,0 +1,8 @@
+{
+    "database": {
+        "type": "remote",
+        "name": "Lexika",
+        "connectionString": "mongodb+srv://francois:<password>@lexika-remote.wdrh8.mongodb.net/Lexika?retryWrites=true&w=majority",
+        "passwordStub": "<password>"
+    }
+}
