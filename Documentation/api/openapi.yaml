@@ -1,0 +1,433 @@
+openapi: '3.0.2'
+
+info:
+  title: "Lexika"
+  description: "A Web application to gain lexicon faster"
+  version: 0.1.0
+  contact:
+    name: Lexika
+    email: francoisvongue@gmail.com
+
+#servers:
+#  - url: 
+#    description: 
+
+tags: 
+  - name: "CRUD operations" 
+  
+servers:
+  - url: https://localhost:5000/
+paths:
+  /user:
+    post:
+      summary: register a user
+      description: |
+        add user information and words as an array of strings
+      operationId: registerUser
+      requestBody:
+        description: user to register
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses: 
+        200:
+          $ref: '#/components/responses/User'
+        400: 
+          description: Invalid request body
+          content: {}
+    get:
+      summary: Attempt to login with a token
+      description: get user info with the help of token
+      operationId: tokinLogin
+      parameters:
+      - in: header
+        name: x-token
+        schema:
+          type: string
+          format: jwt
+        required: true
+      responses:
+        200:
+          $ref: '#/components/responses/User'
+        400:
+          description: Invalid authorization token
+  /user/login:
+    post:
+      summary: Attempt to login with credentials
+      description: get user info with the help of credentials
+      operationId: credentialsLogin
+      requestBody:
+        description: credentials
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        200:
+          $ref: '#/components/responses/User'
+        400:
+          description: Invalid authorization credentials
+    
+  /words:
+    get:
+      summary: Get user words
+      description: returns N user words by addition time
+      operationId: getWords
+      parameters: 
+      - name: number
+        in: query
+        required: false
+        description: number of words
+        schema: 
+            type: integer
+            minimum: 0
+            default: 50
+      responses:
+        200:
+          description: returns an array of Words
+          content:
+            application/json:
+              schema:
+                type: array
+                description: an array of Word objects
+                items:
+                  $ref: '#/components/schemas/Word'
+        401:
+          description: User is not authenticated
+          content: {}
+    post:
+      summary: Add words
+      description: Add new words
+      operationId: addWords
+      requestBody: 
+        description: Array of words to add
+        content: 
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Word'
+      responses:
+        200:
+          description: returns added words
+          content: 
+            application/json:
+              schema:
+                type: array
+                description: an array of added Words
+                items:
+                  $ref: '#/components/schemas/Word'
+        400:
+          description: Invalid request
+          content: {}
+        401:
+          description: User is not authenticated
+          content: {}
+  /words/specific: 
+    get: 
+      summary: Get specific words
+      description: | 
+        Filters words by tags, content and text name and 
+        returns them
+      operationId: filterWords
+      requestBody:
+        description: |
+          an object with tags, text names and approximate
+          word content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WordSearch'
+      responses:
+        200:
+          description: Returns found words
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Word'
+        401:
+          description: User is not authenticated
+          content: {}
+        404:
+          description: Words were not found
+          content: {}
+  /words/word/{id}:
+    patch:
+      summary: Change a word
+      description: Changes a word and returns the changed one
+      operationId: changeWord
+      parameters:
+        - name: Id
+          required: true
+          in: "path"
+          schema:
+            type: integer
+      requestBody:
+        description: Updated word object
+        content: 
+          application/json: 
+              schema:
+                $ref: '#/components/schemas/Word'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Word'
+        401:
+          description: User is not authenticated
+          content: {}
+        404:
+          description: Word not found
+          content: {}
+  /words/repeat:
+    get:
+      summary: get words to repeat
+      description: Returns an array of Words to be repeated
+      operationId: wordsToRepeat
+      parameters:
+        - name: number
+          in: query
+          required: false
+          description: number of words
+          schema:
+            type: integer
+            minimum: 0
+            default: 10
+      responses:
+        200:
+          description: words were found successfuly
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Word'
+        401:
+          description: User is not authenticated
+          content: {}
+        404:
+          description: no words need to be repeated
+          content: {}
+    post:
+      summary: repeat an array of words
+      description: |
+        make server know that you have repeated some words
+      operationId: repeatWords
+      requestBody:
+        description: an array of word ids that were repeated
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        200: 
+          description: words were repeated successfully
+          content: 
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Word'
+        400: 
+          description: Request contained invalid word ids 
+          content: {}
+        401:
+          description: User is not authenticated
+          content: {}
+  /words/tags:
+    post:
+      summary: add new tags for words 
+      description: |
+        add new tags for different words
+      operationId: addTags
+      requestBody:
+        description: An array of strings that are tag names
+        content:
+          application/json: 
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: information about added tags
+          content: 
+            application/json: 
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagInfo'
+        400:
+          description: Invalid request body
+          content: {}
+  /text/words:
+    post:
+      summary: Find words from text
+      description: Takes text adds it to db and returns an array of words from the text
+      operationId: findWords
+      requestBody: 
+        description: Gets string that is text content
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        200:
+          description: words were found successfuly
+          content:
+            application/json:
+              schema:
+                type: object
+                required: 
+                  - words
+                properties:
+                  words:
+                    type: array
+                    description: an array of words
+                    items:
+                      $ref: '#/components/schemas/Word'
+        401:
+          description: User is not authenticated
+          content: {}
+        404:
+          description: Words were not found
+          content: {}
+    
+components:
+  responses:
+    User:
+      description: user object
+      headers:
+        x-token:
+          schema:
+            description: jwt token
+            type: string
+      content: 
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+  schemas:
+    WordSearch:
+      type: object
+      properties:
+        word:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        textNames:
+          type: array
+          items:
+            type: string
+    User:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        login:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        words:
+          type: array
+          items:
+            $ref: '#/components/schemas/WordInfo'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagInfo'
+        texts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextInfo'
+    Credentials:
+      type: object
+      required:
+        - password
+        - login
+      properties:
+        password: 
+          type: string
+        login: 
+          type: string
+    Word: 
+      type: object
+      properties:
+        Id:
+          type: integer
+        UserId:
+          type: integer
+        Content:
+          type: string
+        AdditionTime:
+          type: string
+        LastRepetitionTime:
+          type: string
+        TimesRepeated:
+          type: integer
+        Translations: 
+          type: array
+          description: an Array of translations
+          items: 
+            $ref: '#/components/schemas/Translation'
+        Tags:
+          type: array
+          description: an array of tags
+          items: 
+            $ref: '#/components/schemas/TagInfo'
+        Topic:
+          type: string
+          description: Topic the word was taken from
+    Text:
+      type: object
+      properties:
+        Id:
+          type: integer
+        UserId: 
+          type: integer
+        Content:
+          type: string
+        Name: 
+          type: string
+    TagInfo:
+      type: object
+      properties:
+        Id:
+          type: integer
+        Content: 
+          type: string
+    Translation:
+      type: object
+      properties:
+        Id:
+          type: integer
+        Content: 
+          type: string
+    TextInfo:
+      type: object
+      properties:
+        Id:
+          type: integer
+        Name:
+          type: string
+    WordInfo:
+      type: object
+      properties:
+        Id:
+          type: integer
+        Content:
+          type: string
