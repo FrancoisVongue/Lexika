@@ -8,10 +8,6 @@ info:
     name: Lexika
     email: francoisvongue@gmail.com
 
-#servers:
-#  - url: 
-#    description: 
-
 tags: 
   - name: "CRUD operations" 
   

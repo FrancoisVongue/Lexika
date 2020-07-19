@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6", 
-        "lib": ["ES2015"],
+        "lib": ["esnext"], // what features allowed in your ts code
         "module": "commonjs", 
         "rootDir": "src",
         "outDir": "dist", 
@@ -15,5 +15,5 @@
     },
     "include": [
         "src/**/*"
-    ],
+    ]
 }
